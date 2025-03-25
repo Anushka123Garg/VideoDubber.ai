@@ -7,7 +7,7 @@ import {
   Button,
   Group,
 } from "@mantine/core";
-import { FloatingLabelInput } from "./input";
+// import { FloatingLabelInput } from "./input";
 import ColorSelection from "./colors";
 
 function App() {
