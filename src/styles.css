@@ -1,3 +1,9 @@
+/* @import "tailwindcss"; */ */
+
+[contenteditable] {
+  outline: none;
+}
+
 .ansi-1 { font-weight: bold; }
 .ansi-4 { text-decoration: underline;  }
 
@@ -28,8 +34,7 @@
 .ansi-46 { background-color: #93a1a1; }
 .ansi-47 { background-color: #fdf6e3; }
 
-.ansi-0 {
-    font-weight: normal;
-    color: inherit;
-    background-color: inherit;
-  }
+[class^="ansi-"] {
+  transition: all 0.2s ease;
+}
+

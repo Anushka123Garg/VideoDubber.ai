@@ -7,11 +7,9 @@ import {
   Button,
   Group,
 } from "@mantine/core";
-// import { FloatingLabelInput } from "./input";
 import ColorSelection from "./colors";
 
 function App() {
-  const [selectedAnsi, setSelectedAnsi] = useState("");
   const [text, setText] = useState(
     'Welcome to <span class="ansi-33">Rebane</span>\'s <span class="ansi-45"><span class="ansi-37">Discord</span></span> <span class="ansi-31">C</span><span class="ansi-32">o</span><span class="ansi-33">l</span><span class="ansi-34">o</span><span class="ansi-35">r</span><span class="ansi-36">e</span><span class="ansi-37">d</span>&nbsp;Text Generator!'
   );
@@ -23,23 +21,40 @@ function App() {
     );
   }, []);
 
-  const applyStyle = (ansiCode) => {
-    const textarea = textAreaRef.current;
-    if (!textarea) return;
+  const applyStyle = (ansi) => {
+    const selection = window.getSelection();
+    if (!selection || selection.rangeCount === 0 || selection.toString().trim() === '') {
+        alert('Please select some text first!');
+        return;
+    }
 
-    const start = textarea.selectionStart;
-    const end = textarea.selectionEnd;
+    const range = selection.getRangeAt(0);
+    const selectedText = range.toString();
 
-    if (start === end) return;
+    // For reset/removing formatting
+    if (ansi === '0') {
+        const textNode = document.createTextNode(selectedText);
+        range.deleteContents();
+        range.insertNode(textNode);
+        return;
+    }
 
-    // Wrap selected text with ANSI codes
-    const selectedText = text.substring(start, end);
-    const wrappedText = `<span class="ansi-${ansiCode}">${selectedText}</span>`;
+    const span = document.createElement("span");
+    span.textContent = selectedText;
+    
+    // Add background or foreground class based on the code
+    if (parseInt(ansi) >= 40) {
+        span.className = `ansi-${ansi}`;
+    } else {
+        span.className = `ansi-${ansi}`;
+    }
 
-    // Update the text with the wrapped text
-    const newText = text.substring(0, start) + wrappedText + text.substring(end);
-    setText(newText);
-  };
+    range.deleteContents();
+    range.insertNode(span);
+
+    // Clear selection
+    selection.removeAllRanges();
+};
 
   const copyToClipboard = () => {
     navigator.clipboard.writeText(`\`\`\`ansi\n${text}\n\`\`\``);
@@ -148,9 +163,10 @@ function App() {
         position="center"
         style={{ marginBottom: "1.5rem", marginTop: "1.2rem" }}
       >
-        <Button onClick={() => setText('Welcome to <span class="ansi-33">Rebane</span>\'s <span class="ansi-45"><span class="ansi-37">Discord</span></span> <span class="ansi-31">C</span><span class="ansi-32">o</span><span class="ansi-33">l</span><span class="ansi-34">o</span><span class="ansi-35">r</span><span class="ansi-36">e</span><span class="ansi-37">d</span>&nbsp;Text Generator!')} style={buttonStyle}>Reset All</Button>
-        <Button onClick={() => applyStyle("1")} style={buttonStyle}>Bold</Button>
-        <Button onClick={() => applyStyle("4")} style={buttonStyle}>Underline</Button>
+
+        <Button variant="default" onClick={() => applyStyle('0')} style={buttonStyle}>Reset All</Button>
+        <Button variant="default" onClick={() => applyStyle('1')} style={buttonStyle} fw={700}>Bold</Button>
+        <Button variant="default" onClick={() => applyStyle('4')} style={buttonStyle} td="underline">Line</Button>
       </Group>
 
       <ColorSelection onColorSelect={applyStyle}/>
@@ -204,7 +220,6 @@ const buttonStyle = {
   color: "white",
   cursor: "pointer",
   marginRight: '0.4rem',
-  fontWeight: "bold",
 };
 
 export default App;
