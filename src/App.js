@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import "./styles.css";
+import { ToANSI } from './copy.jsx';
 import {
   Container,
   Title,
@@ -56,9 +57,13 @@ function App() {
     selection.removeAllRanges();
 };
 
-  const copyToClipboard = () => {
-    navigator.clipboard.writeText(`\`\`\`ansi\n${text}\n\`\`\``);
-  };
+const copyToClipboard = async () => {
+  if (!textAreaRef.current) return;
+
+  const toCopy = "```ansi\n" + ToANSI(textAreaRef.current.childNodes, [{ fg: 2, bg: 2, st: 2 }]) + "\n```";
+  await navigator.clipboard.writeText(toCopy); 
+};
+
 
   return (
     <Container
@@ -171,7 +176,6 @@ function App() {
 
       <ColorSelection onColorSelect={applyStyle}/>
 
-      {/* <FloatingLabelInput text={text} setText={setText} textAreaRef={textAreaRef} /> */}
       <div
         ref={textAreaRef}
         contentEditable
